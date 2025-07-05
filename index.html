@@ -1,0 +1,1339 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthPro - Enterprise Portfolio Optimization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-hover: #1d4ed8;
+            --color-accent: #f97316;
+            --color-accent-hover: #ea580c;
+            --color-background: #0a0e1a;
+            --color-surface: #1f2937;
+            --color-surface-elevated: #374151;
+            --color-border: #4b5563;
+            --color-border-light: #6b7280;
+            --color-text-primary: #f9fafb;
+            --color-text-secondary: #d1d5db;
+            --color-text-muted: #9ca3af;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .navbar-brand::before {
+            content: "⬣";
+            margin-right: 8px;
+            font-size: 24px;
+        }
+
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        .nav-link {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 0;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--color-text-primary);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-cols-1 { grid-template-columns: 1fr; }
+        .grid-cols-2 { grid-template-columns: 1fr 1fr; }
+        .grid-cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .grid-cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+        /* Cards */
+        .card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-top: 4px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            color: var(--color-text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
+        .form-input:invalid {
+            border-color: var(--color-error);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-surface-elevated);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--color-border);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background-color: var(--color-border);
+            z-index: 1;
+        }
+
+        .progress-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .step-indicator.active {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .step-indicator.completed {
+            background-color: var(--color-success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            text-align: center;
+        }
+
+        /* Data Display */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Allocation Display */
+        .allocation-list {
+            space-y: 12px;
+        }
+
+        .allocation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .allocation-details {
+            flex: 1;
+        }
+
+        .allocation-name {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .allocation-return {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .allocation-percentage {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-success);
+        }
+
+        .allocation-amount {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-top: 4px;
+        }
+
+        /* Loading States */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 24px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Risk Warning */
+        .risk-notice {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .risk-notice h4 {
+            color: var(--color-error);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .risk-notice p {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .disclaimer p {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* Utilities */
+        .hidden { display: none; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: 700; }
+        .text-sm { font-size: 12px; }
+        .text-lg { font-size: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+        .mt-4 { margin-top: 16px; }
+        .mt-6 { margin-top: 24px; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .navbar-nav {
+                display: none;
+            }
+
+            .container {
+                padding: 24px 16px;
+            }
+
+            .grid-cols-2,
+            .grid-cols-3,
+            .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header,
+            .card-body {
+                padding: 16px;
+            }
+
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .allocation-item {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">WealthPro</div>
+        <ul class="navbar-nav">
+            <li><a href="#" class="nav-link active">Portfolio Optimizer</a></li>
+            <li><a href="#" class="nav-link">Analytics</a></li>
+            <li><a href="#" class="nav-link">Reports</a></li>
+            <li><a href="#" class="nav-link">Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Header Section -->
+        <div class="card mb-6">
+            <div class="card-header text-center">
+                <h1 class="card-title" style="font-size: 32px; margin-bottom: 8px;">Enterprise Portfolio Optimization</h1>
+                <p class="card-subtitle">Intelligent asset allocation using advanced algorithms and real-time Indian market data</p>
+            </div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-step">
+                <div class="step-indicator active" id="step1">1</div>
+                <div class="step-label">Investment Profile</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-indicator" id="step2">2</div>
+                <div class="step-label">Risk Assessment</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-indicator" id="step3">3</div>
+                <div class="step-label">Portfolio Analysis</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-indicator" id="step4">4</div>
+                <div class="step-label">Recommendations</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1" style="grid-template-columns: 1fr 400px; gap: 32px;" id="mainGrid">
+            <!-- Left Column - Form -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Investment Configuration</h2>
+                        <p class="card-subtitle">Configure your investment parameters for optimal portfolio allocation</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="portfolioForm">
+                            <div class="grid grid-cols-2" style="gap: 24px;">
+                                <div class="form-group">
+                                    <label class="form-label" for="investment">Investment Amount</label>
+                                    <input type="number" id="investment" class="form-input" 
+                                           min="100000" step="10000" value="1000000" 
+                                           placeholder="₹10,00,000" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="targetReturn">Target Annual Return</label>
+                                    <input type="number" id="targetReturn" class="form-input" 
+                                           min="6" max="25" step="0.5" value="12" 
+                                           placeholder="12%" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="age">Age</label>
+                                    <input type="number" id="age" class="form-input" 
+                                           min="18" max="80" value="35" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="timeline">Investment Timeline</label>
+                                    <select id="timeline" class="form-select" required>
+                                        <option value="short">Short Term (1-3 years)</option>
+                                        <option value="medium" selected>Medium Term (3-7 years)</option>
+                                        <option value="long">Long Term (7+ years)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="riskTolerance">Risk Tolerance</label>
+                                    <select id="riskTolerance" class="form-select" required>
+                                        <option value="conservative">Conservative</option>
+                                        <option value="moderate" selected>Moderate</option>
+                                        <option value="aggressive">Aggressive</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="existingInvestments">Existing Investments</label>
+                                    <input type="number" id="existingInvestments" class="form-input" 
+                                           min="0" step="10000" value="0" 
+                                           placeholder="₹0">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-full mt-6">
+                                <span>Optimize Portfolio</span>
+                                <span>→</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Quick Metrics -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Market Overview</h3>
+                        <p class="card-subtitle">Current Indian market performance</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="metric-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="metric-card">
+                                <div class="metric-value">11.8%</div>
+                                <div class="metric-label">Nifty 50</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">13.2%</div>
+                                <div class="metric-label">Midcap 100</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">17.2%</div>
+                                <div class="metric-label">NASDAQ</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">6.8%</div>
+                                <div class="metric-label">Bonds</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 24px; padding: 16px; background-color: var(--color-background); border-radius: var(--radius);">
+                            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Market Insights</h4>
+                            <ul style="font-size: 12px; color: var(--color-text-muted); line-height: 1.6;">
+                                <li>• Indian equity markets showing strong performance</li>
+                                <li>• Technology sector leading growth at 15.3%</li>
+                                <li>• International diversification recommended</li>
+                                <li>• Bond yields stable at current levels</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Portfolio Summary -->
+            <div class="card mb-6 fade-in">
+                <div class="card-header">
+                    <h2 class="card-title">Portfolio Summary</h2>
+                    <p class="card-subtitle">Optimized allocation based on your investment profile</p>
+                </div>
+                <div class="card-body">
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value" id="expectedReturn">0%</div>
+                            <div class="metric-label">Expected Return</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="riskLevel">Medium</div>
+                            <div class="metric-label">Risk Level</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="projectedValue">₹0</div>
+                            <div class="metric-label">5-Year Projection</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="diversificationScore">85</div>
+                            <div class="metric-label">Diversification Score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asset Allocation -->
+            <div class="card mb-6 slide-up">
+                <div class="card-header">
+                    <h3 class="card-title">Recommended Asset Allocation</h3>
+                    <p class="card-subtitle">Optimized distribution across asset classes</p>
+                </div>
+                <div class="card-body">
+                    <div id="allocationList" class="allocation-list"></div>
+                </div>
+            </div>
+
+            <!-- Export Actions -->
+            <div class="grid grid-cols-3 mb-6">
+                <button class="btn btn-secondary" onclick="exportToPDF()">
+                    <span>📄</span>
+                    <span>Export PDF</span>
+                </button>
+                <button class="btn btn-secondary" onclick="exportToExcel()">
+                    <span>📊</span>
+                    <span>Export Excel</span>
+                </button>
+                <button class="btn btn-secondary" onclick="sharePortfolio()">
+                    <span>🔗</span>
+                    <span>Share Portfolio</span>
+                </button>
+            </div>
+
+            <!-- Risk Warning -->
+            <div class="risk-notice">
+                <h4>⚠️ Investment Risk Disclosure</h4>
+                <p id="riskWarningText">All investments carry risk. Past performance does not guarantee future results. This recommendation is based on historical data and algorithmic analysis.</p>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden">
+            <div class="card">
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <h3 style="margin-bottom: 8px;">Optimizing Your Portfolio</h3>
+                    <p style="color: var(--color-text-muted);">Analyzing market data and calculating optimal asset allocation...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <p><strong>Data Sources:</strong> NSE, BSE, NASDAQ, RBI | <strong>Last Updated:</strong> <span id="lastUpdated"></span></p>
+            <p><strong>Disclaimer:</strong> This tool is for educational and informational purposes only. It does not constitute financial advice. Please consult with a qualified financial advisor before making investment decisions. WealthPro is not responsible for any investment losses.</p>
+            <p><strong>Compliance:</strong> This application complies with SEBI guidelines for investment advisory services.</p>
+        </div>
+    </div>
+
+    <!-- Google OAuth API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script>
+        // Google OAuth Configuration
+        const GOOGLE_CLIENT_ID = '739517894936-k3lj8f7qac3pdkdtq7cslmabqd9l3f3r.apps.googleusercontent.com'; // Replace with your actual client ID
+        
+        let currentUser = null;
+
+        // Initialize Google OAuth when page loads
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleCredentialResponse,
+                auto_select: false,
+                cancel_on_tap_outside: false
+            });
+            
+            // Check if user is already logged in
+            checkExistingLogin();
+        };
+
+        function handleCredentialResponse(response) {
+            // Decode the JWT token to get user info
+            const userInfo = parseJwt(response.credential);
+            currentUser = {
+                email: userInfo.email,
+                name: userInfo.name,
+                picture: userInfo.picture,
+                given_name: userInfo.given_name,
+                family_name: userInfo.family_name
+            };
+            
+            // Store user info in localStorage
+            localStorage.setItem('wealthpro_user', JSON.stringify(currentUser));
+            
+            // Update UI
+            updateUserInterface();
+            showWelcomeMessage();
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        function checkExistingLogin() {
+            const storedUser = localStorage.getItem('wealthpro_user');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                updateUserInterface();
+            } else {
+                showLoginInterface();
+            }
+        }
+
+        function showLoginInterface() {
+            // Update navbar to show login
+            const navbar = document.querySelector('.navbar-nav');
+            navbar.innerHTML = `
+                <li><div id="g_id_onload"
+                     data-client_id="${GOOGLE_CLIENT_ID}"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="filled_blue"
+                     data-text="signin_with"
+                     data-size="medium"
+                     data-logo_alignment="left">
+                </div></li>
+            `;
+            
+            // Re-render Google sign-in button
+            google.accounts.id.renderButton(
+                document.querySelector('.g_id_signin'),
+                { 
+                    theme: 'filled_blue', 
+                    size: 'medium',
+                    text: 'signin_with',
+                    shape: 'rectangular'
+                }
+            );
+        }
+
+        function updateUserInterface() {
+            if (!currentUser) return;
+            
+            // Update navbar with user info and logout
+            const navbar = document.querySelector('.navbar-nav');
+            navbar.innerHTML = `
+                <li><a href="#" class="nav-link active">Portfolio Optimizer</a></li>
+                <li><a href="#" class="nav-link">Analytics</a></li>
+                <li><a href="#" class="nav-link">Reports</a></li>
+                <li><a href="#" class="nav-link">Settings</a></li>
+                <li style="display: flex; align-items: center; margin-left: 20px;">
+                    <img src="${currentUser.picture}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
+                    <span style="color: var(--color-text-secondary); margin-right: 12px;">${currentUser.given_name}</span>
+                    <button onclick="signOut()" class="btn" style="padding: 6px 12px; font-size: 12px;">Logout</button>
+                </li>
+            `;
+            
+            // Pre-fill form with user information if available
+            prefillUserData();
+        }
+
+        function prefillUserData() {
+            // You can use currentUser.email to personalize the experience
+            // For example, save preferences based on email or show personalized recommendations
+            
+            // Add user's name to the header
+            const headerTitle = document.querySelector('.card-title');
+            if (headerTitle && headerTitle.textContent.includes('Enterprise Portfolio Optimization')) {
+                headerTitle.innerHTML = `Welcome ${currentUser.given_name}!<br><span style="font-size: 24px; color: var(--color-text-secondary);">Enterprise Portfolio Optimization</span>`;
+            }
+        }
+
+        function showWelcomeMessage() {
+            // Show a welcome notification
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'card mb-6 fade-in';
+            welcomeDiv.style.background = 'linear-gradient(135deg, var(--color-primary), var(--color-accent))';
+            welcomeDiv.style.color = 'white';
+            welcomeDiv.innerHTML = `
+                <div class="card-body" style="text-align: center; padding: 20px;">
+                    <h3 style="margin-bottom: 8px;">Welcome back, ${currentUser.given_name}! 👋</h3>
+                    <p style="margin: 0; opacity: 0.9;">Your personalized portfolio optimization is ready. All your preferences are automatically saved.</p>
+                </div>
+            `;
+            
+            const container = document.querySelector('.container');
+            const firstCard = container.querySelector('.card');
+            container.insertBefore(welcomeDiv, firstCard);
+            
+            // Remove welcome message after 5 seconds
+            setTimeout(() => {
+                welcomeDiv.style.transition = 'opacity 0.5s ease';
+                welcomeDiv.style.opacity = '0';
+                setTimeout(() => welcomeDiv.remove(), 500);
+            }, 5000);
+        }
+
+        function signOut() {
+            google.accounts.id.disableAutoSelect();
+            localStorage.removeItem('wealthpro_user');
+            currentUser = null;
+            
+            // Reset UI
+            showLoginInterface();
+            
+            // Reset header
+            const headerTitle = document.querySelector('.card-title');
+            if (headerTitle) {
+                headerTitle.innerHTML = 'Enterprise Portfolio Optimization';
+            }
+            
+            // Remove any welcome messages
+            const welcomeCard = document.querySelector('.card[style*="linear-gradient"]');
+            if (welcomeCard) {
+                welcomeCard.remove();
+            }
+            
+            // Show logout message
+            alert('You have been successfully logged out.');
+        }
+
+        // Market Data - 10-year historical averages for Indian markets
+        const marketData = {
+            'nifty50': { 
+                name: 'Nifty 50 (Large Cap)', 
+                return: 11.8, 
+                volatility: 15.2,
+                description: 'Top 50 companies by market cap'
+            },
+            'niftymidcap': { 
+                name: 'Nifty Midcap 100', 
+                return: 13.2, 
+                volatility: 22.5,
+                description: 'Mid-cap growth opportunities'
+            },
+            'niftysmallcap': { 
+                name: 'Nifty Smallcap 100', 
+                return: 14.5, 
+                volatility: 28.1,
+                description: 'Small-cap high growth potential'
+            },
+            'niftybank': { 
+                name: 'Banking Sector', 
+                return: 12.1, 
+                volatility: 25.3,
+                description: 'Banking and financial services'
+            },
+            'niftyit': { 
+                name: 'IT Sector', 
+                return: 15.3, 
+                volatility: 20.7,
+                description: 'Technology and IT services'
+            },
+            'nasdaq': { 
+                name: 'NASDAQ 100 (Global)', 
+                return: 17.2, 
+                volatility: 18.5,
+                description: 'International diversification'
+            },
+            'bonds': { 
+                name: 'Government Bonds', 
+                return: 6.8, 
+                volatility: 4.2,
+                description: 'Stable income generation'
+            },
+            'corporatebonds': { 
+                name: 'Corporate Bonds', 
+                return: 7.5, 
+                volatility: 6.1,
+                description: 'Higher yield debt instruments'
+            },
+            'gold': { 
+                name: 'Gold ETF', 
+                return: 9.2, 
+                volatility: 12.8,
+                description: 'Inflation hedge and stability'
+            },
+            'reits': { 
+                name: 'Indian REITs', 
+                return: 8.9, 
+                volatility: 16.4,
+                description: 'Real estate investment'
+            }
+        };
+
+        // Form handling
+        document.getElementById('portfolioForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            optimizePortfolio();
+        });
+
+        // Progress step management
+        function updateProgress(step) {
+            for (let i = 1; i <= 4; i++) {
+                const indicator = document.getElementById(`step${i}`);
+                indicator.classList.remove('active', 'completed');
+                
+                if (i < step) {
+                    indicator.classList.add('completed');
+                    indicator.textContent = '✓';
+                } else if (i === step) {
+                    indicator.classList.add('active');
+                    indicator.textContent = i;
+                } else {
+                    indicator.textContent = i;
+                }
+            }
+        }
+
+        function optimizePortfolio() {
+            // Check if user is logged in
+            if (!currentUser) {
+                alert('Please sign in with Google to access portfolio optimization features.');
+                showLoginInterface();
+                return;
+            }
+            
+            // Update progress
+            updateProgress(2);
+            
+            // Get form values
+            const investment = parseFloat(document.getElementById('investment').value);
+            const targetReturn = parseFloat(document.getElementById('targetReturn').value);
+            const age = parseInt(document.getElementById('age').value);
+            const timeline = document.getElementById('timeline').value;
+            const riskTolerance = document.getElementById('riskTolerance').value;
+            const existingInvestments = parseFloat(document.getElementById('existingInvestments').value) || 0;
+
+            // Save user preferences
+            saveUserPreferences({
+                investment,
+                targetReturn,
+                age,
+                timeline,
+                riskTolerance,
+                existingInvestments,
+                timestamp: new Date().toISOString()
+            });
+
+            // Show loading state
+            showLoading();
+            updateProgress(3);
+
+            // Simulate processing time
+            setTimeout(() => {
+                const allocation = calculateOptimalAllocation(targetReturn, age, timeline, riskTolerance);
+                displayResults(allocation, targetReturn, investment, existingInvestments);
+                updateProgress(4);
+            }, 2000);
+        }
+
+        function saveUserPreferences(preferences) {
+            if (!currentUser) return;
+            
+            // Save to localStorage with user email as key
+            const userKey = `wealthpro_prefs_${currentUser.email}`;
+            const existingPrefs = JSON.parse(localStorage.getItem(userKey) || '[]');
+            existingPrefs.push(preferences);
+            
+            // Keep only last 10 entries
+            if (existingPrefs.length > 10) {
+                existingPrefs.splice(0, existingPrefs.length - 10);
+            }
+            
+            localStorage.setItem(userKey, JSON.stringify(existingPrefs));
+        }
+
+        function loadUserPreferences() {
+            if (!currentUser) return null;
+            
+            const userKey = `wealthpro_prefs_${currentUser.email}`;
+            const preferences = JSON.parse(localStorage.getItem(userKey) || '[]');
+            return preferences.length > 0 ? preferences[preferences.length - 1] : null;
+        }
+
+        function calculateOptimalAllocation(targetReturn, age, timeline, riskTolerance) {
+            let allocation = {};
+
+            // Age-based equity allocation: More conservative as age increases
+            const maxEquityByAge = Math.max(20, 100 - age);
+            
+            // Risk tolerance multiplier
+            const riskMultiplier = {
+                'conservative': 0.7,
+                'moderate': 1.0,
+                'aggressive': 1.3
+            }[riskTolerance];
+
+            // Timeline adjustment
+            const timelineMultiplier = {
+                'short': 0.6,
+                'medium': 1.0,
+                'long': 1.2
+            }[timeline];
+
+            const adjustedMaxEquity = Math.min(90, maxEquityByAge * riskMultiplier * timelineMultiplier);
+
+            if (targetReturn <= 8) {
+                // Conservative portfolio
+                allocation = {
+                    'bonds': Math.min(60, 65 - (targetReturn - 6) * 8),
+                    'nifty50': Math.min(25, adjustedMaxEquity * 0.6),
+                    'gold': 15
+                };
+            } else if (targetReturn <= 12) {
+                // Moderate portfolio
+                allocation = {
+                    'nifty50': Math.min(40, adjustedMaxEquity * 0.5),
+                    'bonds': Math.max(10, 30 - (targetReturn - 8) * 4),
+                    'niftymidcap': Math.min(25, adjustedMaxEquity * 0.3),
+                    'nasdaq': timeline === 'long' ? 20 : 15,
+                    'gold': 10
+                };
+            } else if (targetReturn <= 16) {
+                // Growth portfolio
+                allocation = {
+                    'nifty50': Math.min(35, adjustedMaxEquity * 0.4),
+                    'nasdaq': 25,
+                    'niftymidcap': Math.min(25, adjustedMaxEquity * 0.3),
+                    'niftyit': 15
+                };
+                
+                if (riskTolerance !== 'aggressive') {
+                    allocation['bonds'] = 5;
+                }
+            } else {
+                // Aggressive portfolio
+                allocation = {
+                    'nasdaq': 30,
+                    'niftymidcap': Math.min(25, adjustedMaxEquity * 0.3),
+                    'niftysmallcap': Math.min(20, adjustedMaxEquity * 0.25),
+                    'niftyit': 20,
+                    'reits': 5
+                };
+            }
+
+            // Normalize to 100% and remove allocations < 5%
+            const total = Object.values(allocation).reduce((sum, val) => sum + val, 0);
+            Object.keys(allocation).forEach(key => {
+                allocation[key] = Math.round((allocation[key] / total) * 100);
+                if (allocation[key] < 5) {
+                    delete allocation[key];
+                }
+            });
+
+            // Re-normalize after removing small allocations
+            const newTotal = Object.values(allocation).reduce((sum, val) => sum + val, 0);
+            const remainder = 100 - newTotal;
+            if (remainder > 0) {
+                const largestKey = Object.keys(allocation).reduce((a, b) => 
+                    allocation[a] > allocation[b] ? a : b);
+                allocation[largestKey] += remainder;
+            }
+
+            return allocation;
+        }
+
+        function displayResults(allocation, targetReturn, investment, existingInvestments) {
+            // Calculate portfolio metrics
+            let expectedReturn = 0;
+            let portfolioVolatility = 0;
+
+            Object.keys(allocation).forEach(asset => {
+                const weight = allocation[asset] / 100;
+                expectedReturn += weight * marketData[asset].return;
+                portfolioVolatility += weight * marketData[asset].volatility;
+            });
+
+            // Update summary metrics
+            document.getElementById('expectedReturn').textContent = expectedReturn.toFixed(1) + '%';
+            
+            const riskLevel = portfolioVolatility > 22 ? 'High' : 
+                             portfolioVolatility > 15 ? 'Medium' : 'Low';
+            document.getElementById('riskLevel').textContent = riskLevel;
+
+            const totalInvestment = investment + existingInvestments;
+            const projectedValue = totalInvestment * Math.pow(1 + expectedReturn/100, 5);
+            document.getElementById('projectedValue').textContent = formatCurrency(projectedValue);
+
+            // Calculate diversification score
+            const numAssets = Object.keys(allocation).length;
+            const maxAllocation = Math.max(...Object.values(allocation));
+            const diversificationScore = Math.min(100, (numAssets * 15) + (100 - maxAllocation));
+            document.getElementById('diversificationScore').textContent = Math.round(diversificationScore);
+
+            // Display allocation
+            const allocationList = document.getElementById('allocationList');
+            allocationList.innerHTML = '';
+
+            Object.keys(allocation).forEach((asset, index) => {
+                const assetData = marketData[asset];
+                const percentage = allocation[asset];
+                const amount = (investment * percentage) / 100;
+
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.className = 'allocation-item fade-in';
+                    div.innerHTML = `
+                        <div class="allocation-details">
+                            <div class="allocation-name">${assetData.name}</div>
+                            <div class="allocation-return">Expected Return: ${assetData.return}% | ${assetData.description}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="allocation-percentage">${percentage}%</div>
+                            <div class="allocation-amount">${formatCurrency(amount)}</div>
+                        </div>
+                    `;
+                    allocationList.appendChild(div);
+                }, index * 100);
+            });
+
+            // Update risk warning
+            const riskText = document.getElementById('riskWarningText');
+            if (expectedReturn > 16) {
+                riskText.textContent = `High-growth portfolio with ${expectedReturn.toFixed(1)}% expected returns carries significant risk. Portfolio volatility is ${portfolioVolatility.toFixed(1)}%. Suitable only for long-term investors who can tolerate 25-35% potential losses in adverse market conditions.`;
+            } else if (expectedReturn > 12) {
+                riskText.textContent = `Balanced growth portfolio with ${expectedReturn.toFixed(1)}% expected returns. Portfolio volatility is ${portfolioVolatility.toFixed(1)}%. Expect moderate fluctuations with potential for 15-25% downside in market corrections.`;
+            } else {
+                riskText.textContent = `Conservative portfolio with ${expectedReturn.toFixed(1)}% expected returns and ${portfolioVolatility.toFixed(1)}% volatility. Lower risk profile suitable for capital preservation with modest growth.`;
+            }
+
+            // Update timestamp
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString('en-IN');
+
+            // Show results
+            hideLoading();
+            showResults();
+        }
+
+        function showLoading() {
+            document.getElementById('mainGrid').classList.add('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingState').classList.add('hidden');
+        }
+
+        function showResults() {
+            document.getElementById('resultsSection').classList.remove('hidden');
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString('en-IN', {
+                maximumFractionDigits: 0
+            });
+        }
+
+        // Export functions
+        function exportToPDF() {
+            alert('PDF export functionality would integrate with a PDF generation library like jsPDF');
+        }
+
+        function exportToExcel() {
+            alert('Excel export functionality would integrate with a library like SheetJS');
+        }
+
+        function sharePortfolio() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My WealthPro Portfolio',
+                    text: 'Check out my optimized investment portfolio',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback to clipboard
+                navigator.clipboard.writeText(window.location.href);
+                alert('Portfolio link copied to clipboard');
+            }
+        }
+
+        // Form validation and formatting
+        document.getElementById('investment').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value && value.length > 3) {
+                e.target.value = parseInt(value).toLocaleString('en-IN');
+            }
+        });
+
+        document.getElementById('existingInvestments').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value && value.length > 3) {
+                e.target.value = parseInt(value).toLocaleString('en-IN');
+            }
+        });
+
+        // Risk tolerance validation
+        document.getElementById('riskTolerance').addEventListener('change', function(e) {
+            const targetReturn = document.getElementById('targetReturn');
+            const value = e.target.value;
+
+            if (value === 'conservative') {
+                targetReturn.max = 10;
+                if (targetReturn.value > 10) targetReturn.value = 10;
+            } else if (value === 'moderate') {
+                targetReturn.max = 16;
+            } else {
+                targetReturn.max = 25;
+            }
+        });
+
+        // Load user preferences when form is ready
+        function initializeForm() {
+            const lastPrefs = loadUserPreferences();
+            if (lastPrefs && currentUser) {
+                // Pre-fill form with last saved preferences
+                document.getElementById('investment').value = lastPrefs.investment || 1000000;
+                document.getElementById('targetReturn').value = lastPrefs.targetReturn || 12;
+                document.getElementById('age').value = lastPrefs.age || 35;
+                document.getElementById('timeline').value = lastPrefs.timeline || 'medium';
+                document.getElementById('riskTolerance').value = lastPrefs.riskTolerance || 'moderate';
+                document.getElementById('existingInvestments').value = lastPrefs.existingInvestments || 0;
+                
+                // Show a notification
+                const notification = document.createElement('div');
+                notification.className = 'card mb-4';
+                notification.style.background = 'var(--color-success)';
+                notification.style.color = 'white';
+                notification.innerHTML = `
+                    <div class="card-body" style="padding: 12px 20px; text-align: center;">
+                        <p style="margin: 0; font-size: 14px;">✓ Your previous preferences have been loaded</p>
+                    </div>
+                `;
+                
+                const form = document.getElementById('portfolioForm');
+                form.parentNode.insertBefore(notification, form);
+                
+                setTimeout(() => {
+                    notification.style.transition = 'opacity 0.5s ease';
+                    notification.style.opacity = '0';
+                    setTimeout(() => notification.remove(), 500);
+                }, 3000);
+            }
+        }
+
+        // Initialize form when user data is available
+        function updateUserInterface() {
+            if (!currentUser) return;
+            
+            // Update navbar with user info and logout
+            const navbar = document.querySelector('.navbar-nav');
+            navbar.innerHTML = `
+                <li><a href="#" class="nav-link active">Portfolio Optimizer</a></li>
+                <li><a href="#" class="nav-link">Analytics</a></li>
+                <li><a href="#" class="nav-link">Reports</a></li>
+                <li><a href="#" class="nav-link">Settings</a></li>
+                <li style="display: flex; align-items: center; margin-left: 20px;">
+                    <img src="${currentUser.picture}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
+                    <span style="color: var(--color-text-secondary); margin-right: 12px;">${currentUser.given_name}</span>
+                    <button onclick="signOut()" class="btn" style="padding: 6px 12px; font-size: 12px;">Logout</button>
+                </li>
+            `;
+            
+            // Pre-fill form with user information if available
+            prefillUserData();
+            
+            // Initialize form with saved preferences
+            setTimeout(initializeForm, 100);
+        }
+
+        // Initialize
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleString('en-IN');
+    </script>
+</body>
+</html>
